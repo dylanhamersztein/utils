@@ -2,12 +2,11 @@
 
 PROJECTS_DIR="projects"
 
-# apt stuff
 apt update
 apt upgrade -y
 
-# build tools
-apt install build-essential zip unzip git curl exa -y
+# tools
+apt install build-essential zip unzip git curl exa shellcheck jq -y
 
 # install zsh
 apt install zsh -y
