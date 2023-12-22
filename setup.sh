@@ -15,7 +15,7 @@ apt install zsh -y
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
 # set default shell to zsh
-chsh -s $(which zsh)
+chsh -s "$(which zsh)"
 
 add_to_zsh_rc() {
 	(
