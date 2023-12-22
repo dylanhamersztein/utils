@@ -64,13 +64,13 @@ echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This 
 /bin/zsh -c 'npm i -g pnpm'
 /bin/zsh -c 'pnpm i -g prettier tree-sitter-cli'
 
+# set up aliases
+add_to_zsh_rc "source ~/$PROJECTS_DIR/utils/.aliases"
+
 # install sdkman and java 21
 curl -s "https://get.sdkman.io" | bash
 source ~/.sdkman/bin/sdkman-init.sh
 
 sdk install java 21-amzn
-
-# set up aliases
-add_to_zsh_rc "source ~/$PROJECTS_DIR/utils/.aliases"
 
 zsh
