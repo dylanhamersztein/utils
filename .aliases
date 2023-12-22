@@ -1,0 +1,8 @@
+alias aliases='vim ~/.aliases && source ~/.aliases'
+
+alias npm='pnpm'
+
+alias ls='exa --icons -F --colour-scale --no-time --no-user --group-directories-first --header -l'
+alias lsa='exa --icons -F --colour-scale --no-time --no-user --group-directories-first --header -la'
+
+alias update='sudo apt update && sudo apt upgrade -y && brew update && brew upgrade'
