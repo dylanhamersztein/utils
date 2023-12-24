@@ -52,7 +52,7 @@ eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 brew install neovim ripgrep lazygit tree-sitter
 
 # install AstroNvim
-gh repo clone --depth 1 https://github.com/AstroNvim/AstroNvim ~/.config/nvim
+gh repo clone https://github.com/AstroNvim/AstroNvim ~/.config/nvim -- --depth 1
 
 # install my AstroNvim config
 gh repo clone dylanhamersztein/astrovim-configuration ~/.config/nvim/lua/user
