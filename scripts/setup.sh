@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 add_to_zsh_rc() {
 	(
@@ -17,6 +17,17 @@ apt upgrade -y
 # tools
 apt install build-essential zip unzip git curl exa shellcheck jq -y
 
+# configure git
+git config --global user.name "Dylan Hamersztein"
+git config --global user.email "dylanhamersztein@gmail.com"
+
+# github cli
+apt install gh -y
+gh auth login
+
+# clone utils repo first because it's needed early
+gh repo clone dylanhamersztein/utils "$HOME/$PROJECTS_DIR"
+
 # install zsh
 apt install zsh -y
 
@@ -32,14 +43,8 @@ add_to_zsh_rc "export PROJECTS_DIR=$PROJECTS_DIR"
 # powerlevel10k theme
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$HOME"/.oh-my-zsh/custom/themes/powerlevel10k
 sed -i 's#robbyrussell#powerlevel10k/powerlevel10k#' ~/.zshrc
-
-# install git if needed and configure
-git config --global user.name "Dylan Hamersztein"
-git config --global user.email "dylanhamersztein@gmail.com"
-
-# github cli
-apt install gh -y
-gh auth login
+touch "$HOME/.p10k.zsh"
+ln -s "$HOME/.p10k.zsh" "$HOME/$PROJECTS_DIR/utils/.p10k.zsh"
 
 # install brew
 NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -61,7 +66,6 @@ gh repo clone dylanhamersztein/astrovim-configuration ~/.config/nvim/lua/user
 nvim --headless +q
 
 # clone some of my repos
-gh repo clone dylanhamersztein/utils "$HOME/$PROJECTS_DIR"
 gh repo clone dylanhamersztein/diente-de-leon-website "$HOME/$PROJECTS_DIR"
 gh repo clone dylanhamersztein/flag-guessing-game "$HOME/$PROJECTS_DIR"
 
@@ -70,11 +74,6 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 echo 'export NVM_DIR="$HOME/.nvm"' >>~/.zshrc
 echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm' >>~/.zshrc
 echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion' >>~/.zshrc
-
-# add to bashrc as well so the next commands work
-echo 'export NVM_DIR="$HOME/.nvm"' >>~/.bashrc
-echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm' >>~/.bashrc
-echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion' >>~/.bashrc
 
 nvm install node
 npm i -g pnpm
