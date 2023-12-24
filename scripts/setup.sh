@@ -71,6 +71,11 @@ echo 'export NVM_DIR="$HOME/.nvm"' >>~/.zshrc
 echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm' >>~/.zshrc
 echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion' >>~/.zshrc
 
+# add to bashrc as well so the next commands work
+echo 'export NVM_DIR="$HOME/.nvm"' >>~/.bashrc
+echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm' >>~/.bashrc
+echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion' >>~/.bashrc
+
 nvm install node
 npm i -g pnpm
 pnpm i -g prettier tree-sitter-cli
