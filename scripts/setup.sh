@@ -71,9 +71,9 @@ echo 'export NVM_DIR="$HOME/.nvm"' >>~/.zshrc
 echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm' >>~/.zshrc
 echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion' >>~/.zshrc
 
-/bin/zsh -c 'nvm install node'
-/bin/zsh -c 'npm i -g pnpm'
-/bin/zsh -c 'pnpm i -g prettier tree-sitter-cli'
+nvm install node
+npm i -g pnpm
+pnpm i -g prettier tree-sitter-cli
 
 # set up aliases
 add_to_zsh_rc "source ~/$PROJECTS_DIR/utils/.aliases"
