@@ -1,6 +1,15 @@
 #!/bin/sh
 
+add_to_zsh_rc() {
+	(
+		echo
+		echo "$1"
+		echo
+	) >>~/.zshrc
+}
+
 PROJECTS_DIR="projects"
+mkdir -p "$HOME/$PROJECTS_DIR"
 
 apt update
 apt upgrade -y
@@ -16,14 +25,6 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 
 # set default shell to zsh
 chsh -s "$(which zsh)"
-
-add_to_zsh_rc() {
-	(
-		echo
-		echo "$1"
-		echo
-	) >>~/.zshrc
-}
 
 # powerlevel10k theme
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$HOME"/.oh-my-zsh/custom/themes/powerlevel10k
@@ -53,6 +54,14 @@ gh repo clone --depth 1 https://github.com/AstroNvim/AstroNvim ~/.config/nvim
 # install my AstroNvim config
 gh repo clone dylanhamersztein/astrovim-configuration ~/.config/nvim/lua/user
 
+# setup neovim headlessly
+nvim --headless +q
+
+# clone some of my repos
+gh repo clone dylanhamersztein/utils "$HOME/$PROJECTS_DIR"
+gh repo clone dylanhamersztein/diente-de-leon-website "$HOME/$PROJECTS_DIR"
+gh repo clone dylanhamersztein/flag-guessing-game "$HOME/$PROJECTS_DIR"
+
 # install nvm and node
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 echo 'export NVM_DIR="$HOME/.nvm"' >>~/.zshrc
@@ -68,8 +77,8 @@ add_to_zsh_rc "source ~/$PROJECTS_DIR/utils/.aliases"
 
 # install sdkman and java 21
 curl -s "https://get.sdkman.io" | bash
-source ~/.sdkman/bin/sdkman-init.sh
+. "$HOME/.sdkman/bin/sdkman-init.sh"
 
-sdk install java 21-amzn
+sdk install java 21.0.1-amzn
 
 zsh
