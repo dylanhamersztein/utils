@@ -26,6 +26,9 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 # set default shell to zsh
 chsh -s "$(which zsh)"
 
+# export projects directory in .zshrc
+add_to_zsh_rc "export PROJECTS_DIR=$PROJECTS_DIR"
+
 # powerlevel10k theme
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$HOME"/.oh-my-zsh/custom/themes/powerlevel10k
 sed -i 's#robbyrussell#powerlevel10k/powerlevel10k#' ~/.zshrc

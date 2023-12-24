@@ -1,4 +1,4 @@
-alias aliases='vim ~/.aliases && source ~/.aliases'
+alias aliases="vim $HOME/$PROJECTS_DIR/utils/.aliases && source $HOME/$PROJECTS_DIR/utils/.aliases"
 
 alias npm='pnpm'
 
