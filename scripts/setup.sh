@@ -31,8 +31,7 @@ git config --global user.email "dylanhamersztein@gmail.com"
 
 # github cli
 apt install gh -y
-
-gh auth login --web || true
+gh auth login --web
 gh auth setup-git
 
 # clone utils repo first because it's needed early
@@ -53,8 +52,6 @@ add_to_zsh_rc "export PROJECTS_DIR=$PROJECTS_DIR"
 # powerlevel10k theme
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$HOME"/.oh-my-zsh/custom/themes/powerlevel10k
 sed -i 's#robbyrussell#powerlevel10k/powerlevel10k#' ~/.zshrc
-touch "$HOME/.p10k.zsh"
-ln -s "$HOME/.p10k.zsh" "$HOME/$PROJECTS_DIR/utils/.p10k.zsh"
 
 # install brew
 NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
