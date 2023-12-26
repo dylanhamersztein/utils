@@ -32,12 +32,7 @@ git config --global user.email "dylanhamersztein@gmail.com"
 # github cli
 apt install gh -y
 
-login_to_gh() {
-	gh auth login --web
-	return 0
-}
-
-login_to_gh
+gh auth login --web || true
 gh auth setup-git
 
 # clone utils repo first because it's needed early
