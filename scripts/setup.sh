@@ -23,7 +23,7 @@ git config --global user.email "dylanhamersztein@gmail.com"
 
 # github cli
 apt install gh -y
-gh auth login
+gh auth login --web
 
 # clone utils repo first because it's needed early
 gh repo clone dylanhamersztein/utils "$HOME/$PROJECTS_DIR"
