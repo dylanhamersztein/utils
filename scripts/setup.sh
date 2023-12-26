@@ -15,7 +15,15 @@ apt update
 apt upgrade -y
 
 # tools
-apt install build-essential zip unzip git curl exa shellcheck jq -y
+apt install \
+	build-essential \
+	zip \
+	unzip \
+	git \
+	exa \
+	shellcheck \
+	jq \
+	-y
 
 # configure git
 git config --global user.name "Dylan Hamersztein"
@@ -23,7 +31,14 @@ git config --global user.email "dylanhamersztein@gmail.com"
 
 # github cli
 apt install gh -y
-gh auth login --web
+
+login_to_gh() {
+	gh auth login --web
+	return 0
+}
+
+login_to_gh
+gh auth setup-git
 
 # clone utils repo first because it's needed early
 gh repo clone dylanhamersztein/utils "$HOME/$PROJECTS_DIR"
