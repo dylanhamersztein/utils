@@ -1,0 +1,354 @@
+#!/bin/sh
+set -euo >/dev/null
+
+####### Variable definitions #######
+RED="#ff595e"
+GREEN="#8ac926"
+YELLOW="#ffca3a"
+BLACK="#000000"
+
+export GUM_CHOOSE_HEADER_FOREGROUND="$GREEN"
+export GUM_CHOOSE_SELECTED_FOREGROUND="$YELLOW"
+export GUM_CHOOSE_CURSOR_FOREGROUND="$RED"
+
+export GUM_CONFIRM_SELECTED_FOREGROUND="$BLACK"
+export GUM_CONFIRM_SELECTED_BACKGROUND="$YELLOW"
+export GUM_CONFIRM_PROMPT_FOREGROUND="$GREEN"
+
+export GUM_SPIN_TITLE_FOREGROUND="$YELLOW"
+export GUM_SPIN_SPINNER_FOREGROUND="$GREEN"
+
+export GUM_INPUT_HEADER_FOREGROUND="$RED"
+####### End variable definitions #######
+
+####### Function definitions #######
+check_brew_installed_or_exit() {
+  if ! command -v brew >/dev/null 2>&1; then
+    echo "Homebrew could not be found. Please install homebrew and try again."
+    exit
+  fi
+}
+
+check_gum_installed_or_install() {
+  if ! command -v gum >/dev/null 2>&1; then
+    echo "Gum could not be found. Installing gum..."
+    brew install gum
+  fi
+}
+
+print_welcome_message() {
+  welcome_message=$(
+    gum style \
+      --border rounded \
+      --align center \
+      --bold \
+      --padding "1 4" \
+      --margin "4, 4" \
+      --border-foreground "$YELLOW" \
+      --foreground "$GREEN" \
+      '🎉 Welcome to branch-buddy! 🎉'
+  )
+
+  introduction=$(
+    gum style \
+      --border rounded \
+      --align center \
+      --padding "0 1" \
+      --border-foreground "$YELLOW" \
+      "You are starting off from $(green_text "$(bold_text "$(pwd)")"), and you have $(green_text "$(bold_text "$num_directories")") repositories to go through."
+  )
+
+  gum join --align center --vertical "$welcome_message" "$introduction"
+}
+
+print_goodbye_message() {
+  gum style \
+        --border rounded \
+        --align center \
+        --bold \
+        --padding "1 4" \
+        --margin "4, 4" \
+        --border-foreground "$YELLOW" \
+        --foreground "$GREEN" \
+        '🎉 Thank you for using branch-buddy! 🎉'
+}
+
+red_text() {
+  gum style --foreground "$RED" "$1"
+}
+
+green_text() {
+  gum style --foreground "$GREEN" "$1"
+}
+
+yellow_text() {
+  gum style --foreground "$YELLOW" "$1"
+}
+
+bold_text() {
+  gum style --bold "$1"
+}
+
+multichoice() {
+  header="$1"
+  shift
+
+  gum choose \
+    --no-limit \
+    --header "$header" \
+    "$@"
+}
+
+choice() {
+  header="$1"
+  shift
+
+  gum choose \
+    --limit=1 \
+    --header "$header" \
+    "$@"
+}
+
+get_main_branch_name() {
+  git symbolic-ref --short refs/remotes/origin/HEAD | sed 's#^origin/##'
+}
+
+get_current_branch_name() {
+  git rev-parse --abbrev-ref HEAD
+}
+
+get_all_branches() {
+  git branch --format="%(refname:short)"
+}
+
+get_all_git_branches_except_main() {
+  get_all_branches | grep -vE "^$(get_main_branch_name)$"
+}
+
+pull_branch() {
+  branch_name="$1"
+  formatted_branch_name=$(yellow_text "$branch_name")
+
+  update_output=$(gum spin --spinner points --title "Pulling from origin" -- git pull origin "$branch_name")
+
+  case "$update_output" in
+    *"Already up to date"*) echo "$formatted_branch_name already up to date";;
+    *) echo "Updated $formatted_branch_name";;
+  esac
+}
+
+pull_main_branch() {
+  main_branch_name=$(get_main_branch_name)
+  formatted_branch_name=$(yellow_text "$main_branch_name")
+  spinner_title="Updating $formatted_branch_name"
+
+  if [ "$(get_current_branch_name)" = "$main_branch_name" ]; then
+    update_output=$(gum spin --spinner points --title "$spinner_title" --show-output -- git pull)
+  else
+    update_output=$(gum spin --spinner points --title "$spinner_title" --show-output -- git fetch origin "$main_branch_name:$main_branch_name")
+  fi
+
+  case "$update_output" in
+  *"Already up to date"*) echo "$formatted_branch_name already up to date";;
+  *) echo "Updated $formatted_branch_name";;
+  esac
+}
+
+delete_branch() {
+  branch="$1"
+  main_branch_name="$(get_main_branch_name)"
+
+  if [ "$(get_current_branch_name)" != "$main_branch_name" ]; then
+    git reset --hard >/dev/null 2>&1
+    git checkout "$main_branch_name" >/dev/null 2>&1
+  fi
+
+  printf "%s %s...\r" "$(red_text "Deleting")" "$branch"
+
+  git branch -D "$branch" >/dev/null 2>&1
+
+  printf "%s %s                  \n" "$(red_text "Deleted")" "$branch"
+}
+
+merge_main_into_branch() {
+  branch="$1"
+
+  git checkout "$branch" >/dev/null
+
+  printf "Merging %s into %s\r" "$(yellow_text "$(get_main_branch_name)")" "$(green_text "$branch")"
+
+  if git merge "$(get_main_branch_name)" >/dev/null; then
+    echo "Successfully merged $(yellow_text "$(get_main_branch_name)") into $(green_text "$branch")."
+    gum spin --spinner points --title "Pushing $branch to origin..." -- git push
+  else
+    echo "something went wrong... running 'git merge --abort' and checking out '-'"
+    git merge --abort
+  fi
+
+  echo "Switching back to previous branch."
+  git checkout -
+}
+
+choose_individual_or_bulk_processing() {
+  gum confirm \
+    "Would you like to operate on each branch individually or in bulk?" \
+    --affirmative="Individually" \
+    --negative="Bulk" \
+    --default=1
+}
+
+handle_bulk_processing() {
+  branches=$1
+  main_branch_name=$(get_main_branch_name)
+
+  action=$(choice "What would you like to do with selected branches?" "pull from origin" "merge $main_branch_name" "delete" "skip")
+
+  case "$action" in
+  "merge $main_branch_name")
+    for branch in $branches; do
+      merge_main_into_branch "$branch"
+    done
+    echo
+    ;;
+
+  "pull from origin")
+    for branch in $branches; do
+      pull_branch "$branch"
+    done
+    echo
+    ;;
+
+  "delete")
+    if gum confirm "Are you sure you want to delete selected branches?"; then
+      for branch in $branches; do
+        delete_branch "$branch"
+      done
+    else
+      echo "Not deleting any of the selected branches"
+    fi
+    ;;
+
+  *)
+    yellow_text "Skipped processing branches"
+    ;;
+  esac
+}
+
+handle_individual_processing() {
+  branches="$1"
+  main_branch_name=$(get_main_branch_name)
+
+  for branch in $branches; do
+    action=$(choice "What would you like to do with $branch?" "pull $branch from origin" "merge $main_branch_name" "delete" "skip")
+
+    case "$action" in
+    "merge $main_branch_name")
+      merge_main_into_branch "$branch"
+      ;;
+
+    "pull $branch from origin")
+      pull_branch "$branch"
+      ;;
+
+    "delete")
+      if gum confirm "Are you sure you want to delete $branch?"; then
+        delete_branch "$branch"
+      else
+        echo "Not deleting $(yellow_text "$branch")"
+      fi
+      ;;
+    *)
+      yellow_text "Skipped $branch"
+      ;;
+    esac
+  done
+}
+
+change_dir() {
+  cd "$1" >/dev/null 2>&1 || (red_text "Could not find directory $1." && exit 1)
+}
+
+trim_leading_whitespace() {
+  sed "s#^[[:space:]]*##"
+}
+####### End function definitions #######
+
+####### Start main script #######
+check_brew_installed_or_exit
+
+check_gum_installed_or_install
+
+projects_dir=$(gum input \
+  --placeholder="projects/" \
+  --header "Please enter the location of all your projects. Include trailing slash.")
+
+if [ "$projects_dir" = "" ]; then
+  projects_dir="projects/"
+fi
+
+change_dir "$HOME/$projects_dir"
+
+directories=$(ls -d -- */)
+num_directories="$(echo "$directories" | wc -l | trim_leading_whitespace)"
+
+print_welcome_message
+
+start="$(gum input --header="Would you like to start?" --placeholder="y/n" --char-limit=1)"
+
+if echo "$start" | grep -qvi "y"; then
+  red_text "User exited program."
+  exit 1
+fi
+
+directory_counter=0
+for directory in $directories; do
+  change_dir "$directory"
+
+  directory_counter=$((directory_counter + 1))
+  echo "$directory_counter/$num_directories:"
+
+  echo "You are currently in $(green_text "$(bold_text "$directory")")"
+
+  pull_main_branch
+
+  if [ "$(get_all_branches)" = "$(get_main_branch_name)" ]; then
+    yellow_text "No local branches found except $(get_main_branch_name). Continuing."
+    echo
+    change_dir -
+    continue
+  fi
+
+  # shellcheck disable=SC2046
+  branches="$(multichoice "Choose branch/es! (␣ to select, ⏎ to proceed)" $(get_all_git_branches_except_main) "skip repository")"
+
+  case "$branches" in
+  "" | *skip*)
+    echo "Skipped $(yellow_text "$directory")"
+    echo
+    change_dir -
+    continue
+    ;;
+  esac
+
+  num_selected_branches="$(echo "$branches" | wc -w | trim_leading_whitespace)"
+
+  case "$num_selected_branches" in
+  1)
+    handle_individual_processing "$branches"
+    echo
+    ;;
+
+  *)
+    if choose_individual_or_bulk_processing; then
+      handle_individual_processing "$branches"
+    else
+      handle_bulk_processing "$branches"
+    fi
+    echo
+    ;;
+  esac
+
+  change_dir -
+done
+
+print_goodbye_message
