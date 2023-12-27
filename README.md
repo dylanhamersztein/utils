@@ -8,6 +8,6 @@ A repository I can use to setup new Linux instances for my development.
 
 Some aliases I like to use.
 
-### setup.sh
+### branch-buddy
 
-A script which installs all the things I like.
+A script which iterates through all git repositories in a folder and manages their branches.
