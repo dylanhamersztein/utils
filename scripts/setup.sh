@@ -63,8 +63,8 @@ eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 # install some brew packages for astrovim
 brew install neovim ripgrep lazygit tree-sitter
 
-# install AstroNvim
-gh repo clone https://github.com/AstroNvim/AstroNvim ~/.config/nvim -- --depth 1
+# install AstroNvim at the correct version for my config
+gh repo clone https://github.com/AstroNvim/AstroNvim ~/.config/nvim -- --depth 1 --branch v3.45.3
 
 # install my AstroNvim config
 gh repo clone dylanhamersztein/astrovim-configuration ~/.config/nvim/lua/user
@@ -76,18 +76,17 @@ nvim --headless +q
 gh repo clone dylanhamersztein/diente-de-leon-website "$HOME/$PROJECTS_DIR"
 gh repo clone dylanhamersztein/flag-guessing-game "$HOME/$PROJECTS_DIR"
 
-# install nvm and node
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+# install fnm and node
+curl -o- https://raw.githubusercontent.com/Schniz/fnm/master/.ci/install.sh | bash
 
-echo 'export NVM_DIR="$HOME/.nvm"' >>~/.zshrc
-echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm' >>~/.zshrc
-echo '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion' >>~/.zshrc
+PATH="/home/dylan/.local/share/fnm:$PATH"
+eval "$(fnm env)"
 
-nvm install node
-npm i -g pnpm
+add_to_zsh_rc 'export PATH="/home/dylan/.local/share/fnm:$PATH"'
+add_to_zsh_rc 'eval "$(fnm env --use-on-cd)"'
+
+fnm install v20.12.2
+npm i -g pnpm yarn
 pnpm setup
 pnpm i -g prettier tree-sitter-cli
 
