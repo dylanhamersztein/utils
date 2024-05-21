@@ -11,11 +11,11 @@ add_to_zsh_rc() {
 PROJECTS_DIR="projects"
 mkdir -p "$HOME/$PROJECTS_DIR"
 
-apt update
-apt upgrade -y
+apt-get update
+apt-get upgrade -y
 
 # tools
-apt install \
+apt-get install \
 	build-essential \
 	zip \
 	unzip \
@@ -30,7 +30,7 @@ git config --global user.name "Dylan Hamersztein"
 git config --global user.email "dylanhamersztein@gmail.com"
 
 # github cli
-apt install gh -y
+apt-get install gh -y
 gh auth login --web
 gh auth setup-git
 
@@ -38,7 +38,7 @@ gh auth setup-git
 gh repo clone dylanhamersztein/utils "$HOME/$PROJECTS_DIR"
 
 # install zsh
-apt install zsh -y
+apt-get install zsh -y
 
 # install oh my zsh
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
