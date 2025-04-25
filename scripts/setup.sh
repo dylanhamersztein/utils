@@ -66,7 +66,7 @@ brew install neovim ripgrep lazygit tree-sitter exa
 gh repo clone https://github.com/AstroNvim/AstroNvim ~/.config/nvim -- --depth 1 --branch v3.45.3
 
 # install my AstroNvim config
-gh repo clone dylanhamersztein/astrovim-configuration ~/.config/nvim/lua/user
+gh repo clone dylanhamersztein/nvim-configuration ~/.config/nvim
 
 # setup neovim headlessly
 nvim --headless +q
