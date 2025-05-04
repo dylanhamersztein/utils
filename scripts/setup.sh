@@ -1,13 +1,5 @@
 #!/bin/bash
 
-add_to_zsh_rc() {
-	(
-		echo
-		echo "$1"
-		echo
-	) >>~/.zshrc
-}
-
 PROJECTS_DIR="projects"
 mkdir -p "$HOME/$PROJECTS_DIR"
 
@@ -45,25 +37,17 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 # set default shell to zsh
 chsh -s "$(which zsh)"
 
-# export projects directory in .zshrc
-add_to_zsh_rc "export PROJECTS_DIR=$PROJECTS_DIR"
-
 # powerlevel10k theme
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$HOME"/.oh-my-zsh/custom/themes/powerlevel10k
-sed -i 's#robbyrussell#powerlevel10k/powerlevel10k#' ~/.zshrc
 
 # install brew
 NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 # add brew to path
-add_to_zsh_rc 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 # install some brew packages for astrovim
-brew install neovim ripgrep lazygit tree-sitter eza bat
-
-# install AstroNvim at the correct version for my config
-gh repo clone https://github.com/AstroNvim/AstroNvim ~/.config/nvim -- --depth 1 --branch v3.45.3
+brew install neovim ripgrep lazygit tree-sitter eza bat fzf
 
 # install my AstroNvim config
 gh repo clone dylanhamersztein/nvim-configuration ~/.config/nvim
@@ -74,6 +58,13 @@ nvim --headless +q
 # clone some of my repos
 gh repo clone dylanhamersztein/diente-de-leon-website "$HOME/$PROJECTS_DIR"
 gh repo clone dylanhamersztein/flag-guessing-game "$HOME/$PROJECTS_DIR"
+gh repo clone dylanhamersztein/klox "$HOME/$PROJECTS_DIR"
+
+# install tmux
+gh repo clone tmux-plugins/tpm ~/.tmux/plugins/tpm
+
+# link tmux configuration file to the one in this repo, removing the existing file if it exists
+ln -sf ~/$PROJECTS_DIR/utils/.tmux.conf ~/.tmux.conf
 
 # install fnm and node
 curl -o- https://raw.githubusercontent.com/Schniz/fnm/master/.ci/install.sh | bash
@@ -81,21 +72,21 @@ curl -o- https://raw.githubusercontent.com/Schniz/fnm/master/.ci/install.sh | ba
 PATH="/home/dylan/.local/share/fnm:$PATH"
 eval "$(fnm env)"
 
-add_to_zsh_rc 'export PATH="/home/dylan/.local/share/fnm:$PATH"'
-add_to_zsh_rc 'eval "$(fnm env --use-on-cd)"'
-
 fnm install v20.12.2
 npm i -g pnpm yarn
 pnpm setup
 pnpm i -g prettier tree-sitter-cli
-
-# set up aliases
-add_to_zsh_rc "source ~/$PROJECTS_DIR/utils/.aliases"
 
 # install sdkman and java 21
 curl -s "https://get.sdkman.io" | bash
 . "$HOME/.sdkman/bin/sdkman-init.sh"
 
 sdk install java 21.0.1-amzn
+
+# link .zshrc in root to the file in this project, removing the existing .zshrc if it exists
+ln -sf ~/PROJECTS_DIR/utils/.zshrc ~/.zshrc
+
+# link .aliases in root directory to the file in this repo, removing the existing file if it exists
+ln -sf ~/PROJECTS_DIR/utils/.aliases ~/.aliases
 
 zsh
