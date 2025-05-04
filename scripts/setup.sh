@@ -60,7 +60,7 @@ add_to_zsh_rc 'eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"'
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
 # install some brew packages for astrovim
-brew install neovim ripgrep lazygit tree-sitter exa
+brew install neovim ripgrep lazygit tree-sitter eza bat
 
 # install AstroNvim at the correct version for my config
 gh repo clone https://github.com/AstroNvim/AstroNvim ~/.config/nvim -- --depth 1 --branch v3.45.3
