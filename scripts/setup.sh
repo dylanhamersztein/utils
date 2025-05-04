@@ -89,4 +89,8 @@ ln -sf ~/PROJECTS_DIR/utils/.zshrc ~/.zshrc
 # link .aliases in root directory to the file in this repo, removing the existing file if it exists
 ln -sf ~/PROJECTS_DIR/utils/.aliases ~/.aliases
 
+# install zoxide
+curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
+eval "$(zoxide init zsh)"
+
 zsh

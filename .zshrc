@@ -18,6 +18,10 @@ source ~/.aliases
 
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
+# zoxide
+export PATH="/home/dylan/.local/bin:$PATH"
+eval "$(zoxide init zsh)"
+
 # fnm
 FNM_PATH="/home/dylan/.local/share/fnm"
 if [ -d "$FNM_PATH" ]; then
