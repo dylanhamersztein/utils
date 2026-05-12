@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+set -euo pipefail
 
 PROJECTS_DIR="projects"
 mkdir -p "$HOME/$PROJECTS_DIR"
@@ -20,13 +22,19 @@ apt-get install \
 git config --global user.name "Dylan Hamersztein"
 git config --global user.email "dylanhamersztein@gmail.com"
 
-# github cli
+# github cli (official apt repo)
+mkdir -p -m 755 /etc/apt/keyrings
+curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg -o /etc/apt/keyrings/githubcli-archive-keyring.gpg
+chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+	> /etc/apt/sources.list.d/github-cli.list
+apt-get update
 apt-get install gh -y
 gh auth login --web
 gh auth setup-git
 
 # clone utils repo first because it's needed early
-gh repo clone dylanhamersztein/utils "$HOME/$PROJECTS_DIR"
+gh repo clone dylanhamersztein/utils "$HOME/$PROJECTS_DIR/utils"
 
 # install zsh
 apt-get install zsh -y
@@ -56,15 +64,15 @@ gh repo clone dylanhamersztein/nvim-configuration ~/.config/nvim
 nvim --headless +q
 
 # clone some of my repos
-gh repo clone dylanhamersztein/diente-de-leon-website "$HOME/$PROJECTS_DIR"
-gh repo clone dylanhamersztein/flag-guessing-game "$HOME/$PROJECTS_DIR"
-gh repo clone dylanhamersztein/klox "$HOME/$PROJECTS_DIR"
+gh repo clone dylanhamersztein/diente-de-leon-website "$HOME/$PROJECTS_DIR/diente-de-leon-website"
+gh repo clone dylanhamersztein/flag-guessing-game "$HOME/$PROJECTS_DIR/flag-guessing-game"
+gh repo clone dylanhamersztein/klox "$HOME/$PROJECTS_DIR/klox"
 
 # install tmux
 gh repo clone tmux-plugins/tpm ~/.tmux/plugins/tpm
 
 # link tmux configuration file to the one in this repo, removing the existing file if it exists
-ln -sf ~/$PROJECTS_DIR/utils/.tmux.conf ~/.tmux.conf
+ln -sf "$HOME/$PROJECTS_DIR/utils/.tmux.conf" "$HOME/.tmux.conf"
 
 # install fnm and node
 curl -o- https://raw.githubusercontent.com/Schniz/fnm/master/.ci/install.sh | bash
@@ -74,6 +82,10 @@ eval "$(fnm env)"
 
 fnm install v20.12.2
 npm i -g pnpm yarn
+
+# make pnpm's global bin dir available in this session before installing globals
+export PNPM_HOME="$HOME/.local/share/pnpm"
+export PATH="$PNPM_HOME:$PATH"
 pnpm setup
 pnpm i -g prettier tree-sitter-cli
 
@@ -84,10 +96,10 @@ curl -s "https://get.sdkman.io" | bash
 sdk install java 21.0.1-amzn
 
 # link .zshrc in root to the file in this project, removing the existing .zshrc if it exists
-ln -sf ~/PROJECTS_DIR/utils/.zshrc ~/.zshrc
+ln -sf "$HOME/$PROJECTS_DIR/utils/.zshrc" "$HOME/.zshrc"
 
 # link .aliases in root directory to the file in this repo, removing the existing file if it exists
-ln -sf ~/PROJECTS_DIR/utils/.aliases ~/.aliases
+ln -sf "$HOME/$PROJECTS_DIR/utils/.aliases" "$HOME/.aliases"
 
 # install zoxide
 curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
