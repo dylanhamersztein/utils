@@ -2,8 +2,6 @@
 
 alias aliases="vim $HOME/$PROJECTS_DIR/utils/.aliases && source $HOME/$PROJECTS_DIR/utils/.aliases"
 
-alias npm='pnpm'
-
 alias cat='bat -P'
 
 alias ls='eza --icons -F --colour-scale --no-time --no-user --group-directories-first --header -l'
