@@ -7,7 +7,7 @@ alias cat='bat -P'
 alias ls='eza --icons -F --colour-scale --no-time --no-user --group-directories-first --header -l'
 alias lsa='eza --icons -F --colour-scale --no-time --no-user --group-directories-first --header -la'
 
-alias update='sudo apt update && sudo apt upgrade -y && brew update && brew upgrade'
+alias u='sudo apt update && sudo apt upgrade -y && brew update && brew upgrade'
 
 # fh - repeat history
 h() {
