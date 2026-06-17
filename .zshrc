@@ -55,5 +55,5 @@ export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
 
 if [[ -z "$TMUX" ]]; then
-  tmux
+  tmux new-session -A -s tmux
 fi
